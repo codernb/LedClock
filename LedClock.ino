@@ -1,24 +1,15 @@
-byte ledMap[72][2] = { { 7, 8 }, { 8, 7 }, { 7, 9 }, { 9, 7 } };
+#define PHOTO_RESISTOR_PIN 0
 
-int photoResistorValue;
+byte ledMap[72][2] = { { 7, 8 }, { 8, 7 }, { 7, 9 }, { 9, 7 } };
 
 byte hourLed;
 byte minLed;
 
-byte photoResistorPin = 0;
-byte transistor1ControlPin = 7;
-byte transistor2ControlPin = 8;
-byte thirdPin = 9;
 bool alternate;
-byte ledDelay = 1;
+byte ledDelay;
 
 void setup() {
-	for (byte i = 0; i < 10; i++) {
-		pinMode(i, OUTPUT);
-		digitalWrite(i, HIGH);
-	}
-	setHourLed(0);
-	setMinLed(1);
+	;
 }
 
 void loop() {
@@ -46,7 +37,7 @@ void setHourLed(byte pin) {
 }
 
 void lightLevel() {
-	photoResistorValue = analogRead(photoResistorPin);
+	int photoResistorValue = analogRead(PHOTO_RESISTOR_PIN);
 	switch (ledDelay) {
 	case (0):
 		if (photoResistorValue < 200)
@@ -67,19 +58,21 @@ void lightLevel() {
 
 void light() {
 	if (alternate) {
-		setToInput(minLed);
-		delay(ledDelay);
-		setToOutput(hourLed);
-		digitalWrite(ledMap[hourLed][0], HIGH);
-		digitalWrite(ledMap[hourLed][1], LOW);
-	} else {
 		setToInput(hourLed);
 		delay(ledDelay);
-		setToOutput(minLed);
-		digitalWrite(ledMap[minLed][0], HIGH);
-		digitalWrite(ledMap[minLed][1], LOW);
+		setActive(minLed);
+	} else {
+		setToInput(minLed);
+		delay(ledDelay);
+		setActive(hourLed);
 	}
 	alternate = !alternate;
+}
+
+void setActive(byte led) {
+	setToOutput(led);
+	digitalWrite(ledMap[led][0], HIGH);
+	digitalWrite(ledMap[led][1], LOW);
 }
 
 void setToInput(byte led) {
