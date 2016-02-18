@@ -36,15 +36,11 @@ void loop() {
 }
 
 void setMinLed(byte pin) {
-//	pinMode(ledMap[minLed][0], INPUT);
-//	pinMode(ledMap[minLed][1], INPUT);
 	setToInput(minLed);
 	minLed = pin;
 }
 
 void setHourLed(byte pin) {
-//	pinMode(ledMap[hourLed][0], INPUT);
-//	pinMode(ledMap[hourLed][1], INPUT);
 	setToInput(hourLed);
 	hourLed = pin;
 }
@@ -71,22 +67,14 @@ void lightLevel() {
 
 void light() {
 	if (alternate) {
-//		pinMode(ledMap[minLed][0], INPUT);
-//		pinMode(ledMap[minLed][1], INPUT);
 		setToInput(minLed);
 		delay(ledDelay);
-//		pinMode(ledMap[hourLed][0], OUTPUT);
-//		pinMode(ledMap[hourLed][1], OUTPUT);
 		setToOutput(hourLed);
 		digitalWrite(ledMap[hourLed][0], HIGH);
 		digitalWrite(ledMap[hourLed][1], LOW);
 	} else {
-//		pinMode(ledMap[hourLed][0], INPUT);
-//		pinMode(ledMap[hourLed][1], INPUT);
 		setToInput(hourLed);
 		delay(ledDelay);
-//		pinMode(ledMap[minLed][0], OUTPUT);
-//		pinMode(ledMap[minLed][1], OUTPUT);
 		setToOutput(minLed);
 		digitalWrite(ledMap[minLed][0], HIGH);
 		digitalWrite(ledMap[minLed][1], LOW);
