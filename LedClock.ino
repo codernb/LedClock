@@ -1,3 +1,5 @@
+#include <Arduino.h>
+
 #define PHOTO_RESISTOR_PIN 0
 
 byte ledMap[72][2] = { { 7, 8 }, { 8, 7 }, { 7, 9 }, { 9, 7 } };
