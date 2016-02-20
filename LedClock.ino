@@ -49,9 +49,9 @@ void loop() {
 void time() {
 	unsigned long int ms = millis();
 //	byte min = (ms / 60000 + minuteOffset) % 60;
-	byte min = (ms / 1000 + minuteOffset) % 60;
+	byte min = (ms / 500 + minuteOffset) % 60;
 //	byte hour = (ms / 3600000 + hourOffset) % 12;
-	byte hour = (ms / 3600 + hourOffset) % 12;
+	byte hour = (ms / 30000 + hourOffset) % 12;
 	setMinuteLed(min);
 	setHourLed(hour);
 }
