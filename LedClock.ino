@@ -10,8 +10,8 @@
 #define PIN_OFFSET 1
 
 const byte minutesMap[60][2] = {
-		{ 8, 4 }, //60
-		{ 1, 2 }, //1
+		{ 8, 4 },
+		{ 1, 2 },
 		{ 2, 1 },
 		{ 3, 2 },
 		{ 2, 3 },
@@ -20,7 +20,7 @@ const byte minutesMap[60][2] = {
 		{ 5, 4 },
 		{ 4, 5 },
 		{ 5, 6 },
-		{ 6, 5 }, //10
+		{ 6, 5 },
 		{ 7, 6 },
 		{ 6, 7 },
 		{ 7, 8 },
@@ -30,7 +30,7 @@ const byte minutesMap[60][2] = {
 		{ 9, 7 },
 		{ 7, 9 },
 		{ 5, 7 },
-		{ 7, 5 }, //20
+		{ 7, 5 },
 		{ 5, 3 },
 		{ 3, 5 },
 		{ 1, 3 },
@@ -40,7 +40,7 @@ const byte minutesMap[60][2] = {
 		{ 7, 4 },
 		{ 4, 7 },
 		{ 7, 2 },
-		{ 2, 7 }, //30
+		{ 2, 7 },
 		{ 4, 2 },
 		{ 2, 4 },
 		{ 4, 6 },
@@ -50,7 +50,7 @@ const byte minutesMap[60][2] = {
 		{ 8, 5 },
 		{ 5, 8 },
 		{ 2, 5 },
-		{ 5, 2 }, //40
+		{ 5, 2 },
 		{ 2, 9 },
 		{ 9, 2 },
 		{ 6, 9 },
@@ -60,7 +60,7 @@ const byte minutesMap[60][2] = {
 		{ 9, 3 },
 		{ 3, 9 },
 		{ 9, 5 },
-		{ 5, 9 }, //50
+		{ 5, 9 },
 		{ 1, 5 },
 		{ 5, 1 },
 		{ 1, 6 },
@@ -69,11 +69,11 @@ const byte minutesMap[60][2] = {
 		{ 6, 2 },
 		{ 2, 8 },
 		{ 8, 2 },
-		{ 4, 8 } //59
+		{ 4, 8 }
 };
 
 const byte hoursMap[12][2] = {
-		{ 4, 9 }, //h1
+		{ 4, 9 },
 		{ 7, 1 },
 		{ 1, 7 },
 		{ 7, 3 },
@@ -82,9 +82,9 @@ const byte hoursMap[12][2] = {
 		{ 3, 8 },
 		{ 8, 1 },
 		{ 1, 8 },
-		{ 9, 1 }, //h10
+		{ 9, 1 },
 		{ 1, 9 },
-		{ 9, 4 } //h12
+		{ 9, 4 }
 };
 
 const byte downBarrierValue = MAX_DELAY + 2;
@@ -172,21 +172,37 @@ void lightInterval() {
 }
 
 void setMinuteActive() {
-	setActive(minutesMap[minute][0], minutesMap[minute][1]);
+	setActive(getMinuteHighPin(), getMinuteLowPin());
 }
 
 void setHourActive() {
-	setActive(hoursMap[hour][0], hoursMap[hour][1]);
+	setActive(getHourHighPin(), getHourLowPin());
 }
 
 void setMinuteInactive() {
-	setToInput(minutesMap[minute][0]);
-	setToInput(minutesMap[minute][1]);
+	setToInput(getMinuteLowPin());
+	setToInput(getMinuteHighPin());
 }
 
 void setHourInactive() {
-	setToInput(hoursMap[hour][0]);
-	setToInput(hoursMap[hour][1]);
+	setToInput(getHourLowPin());
+	setToInput(getHourHighPin());
+}
+
+byte getMinuteHighPin() {
+	return minutesMap[minute][0];
+}
+
+byte getMinuteLowPin() {
+	return minutesMap[minute][1];
+}
+
+byte getHourHighPin() {
+	return hoursMap[hour][0];
+}
+
+byte getHourLowPin() {
+	return hoursMap[hour][1];
 }
 
 void setActive(byte highPin, byte lowPin) {
