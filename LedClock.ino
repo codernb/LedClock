@@ -7,8 +7,9 @@
 #define UP_BARRIER (upBarrierValue - ledDelay) * 50
 #define MINUTE_BUTTON_PIN 12
 #define HOUR_BUTTON_PIN 11
+#define PIN_OFFSET 1
 
-const byte ledMap[72][2] = {
+const byte minutesMap[60][2] = {
 		{ 8, 4 }, //60
 		{ 1, 2 }, //1
 		{ 2, 1 },
@@ -68,7 +69,10 @@ const byte ledMap[72][2] = {
 		{ 6, 2 },
 		{ 2, 8 },
 		{ 8, 2 },
-		{ 4, 8 }, //59
+		{ 4, 8 } //59
+};
+
+const byte hoursMap[12][2] = {
 		{ 4, 9 }, //h1
 		{ 7, 1 },
 		{ 1, 7 },
@@ -80,16 +84,15 @@ const byte ledMap[72][2] = {
 		{ 1, 8 },
 		{ 9, 1 }, //h10
 		{ 1, 9 },
-		{ 9, 4 }
+		{ 9, 4 } //h12
 };
 
 const byte downBarrierValue = MAX_DELAY + 2;
 const byte upBarrierValue = MAX_DELAY + 3;
 
-byte minuteLed;
-byte hourLed;
-byte minuteOffset;
-byte hourOffset;
+byte minute;
+byte hour;
+byte oldMinute;
 
 bool alternate;
 byte ledDelay;
@@ -105,56 +108,46 @@ void setup() {
 void loop() {
 	time();
 	lightLevel();
-	light();
+	lightInterval();
 	buttons();
 }
 
 void time() {
 	unsigned long int ms = millis();
-	byte minute = (ms / 60000 + minuteOffset) % 60;
-	byte hour = (ms / 3600000 + hourOffset) % 12;
-	setMinuteLed(minute);
-	setHourLed(hour);
-}
-
-void setMinuteLed(byte led) {
-	if (led == minuteLed)
-		return;
-	setToInput(minuteLed);
-	minuteLed = led;
-}
-
-void setHourLed(byte led) {
-	led += 60;
-	if (led == hourLed)
-		return;
-	setToInput(hourLed);
-	hourLed = led;
+	byte newMinute = (ms / 60000) % 60;
+	if (newMinute != oldMinute) {
+		incrementMinute();
+		oldMinute = newMinute;
+	}
 }
 
 void buttons() {
 	byte minuteButtonState = digitalRead(MINUTE_BUTTON_PIN);
 	byte hourButtonState = digitalRead(HOUR_BUTTON_PIN);
 	if (!minuteButtonPressed && minuteButtonState == HIGH) {
-		addMinOffset();
+		incrementMinute();
 		minuteButtonPressed = true;
 	} else if (minuteButtonState == LOW) {
 		minuteButtonPressed = false;
 	}
 	if (!hourButtonPressed && hourButtonState == HIGH) {
-		addHourOffset();
+		incrementHour();
 		hourButtonPressed = true;
 	} else if (hourButtonState == LOW) {
 		hourButtonPressed = false;
 	}
 }
 
-void addMinOffset() {
-	minuteOffset = (minuteOffset + 1) % 60;
+void incrementMinute() {
+	setMinuteInactive();
+	minute = (minute + 1) % 60;
+	if (minute == 0)
+		incrementHour();
 }
 
-void addHourOffset() {
-	hourOffset = (hourOffset + 1) % 12;
+void incrementHour() {
+	setHourInactive();
+	hour = (hour + 1) % 12;
 }
 
 void lightLevel() {
@@ -165,31 +158,56 @@ void lightLevel() {
 		ledDelay--;
 }
 
-void light() {
+void lightInterval() {
 	if (alternate) {
-		setToInput(hourLed);
+		setHourInactive();
 		delay(ledDelay);
-		setActive(minuteLed);
+		setMinuteActive();
 	} else {
-		setToInput(minuteLed);
+		setMinuteInactive();
 		delay(ledDelay);
-		setActive(hourLed);
+		setHourActive();
 	}
 	alternate = !alternate;
 }
 
-void setActive(byte led) {
-	setToOutput(led);
-	digitalWrite(ledMap[led][0] + 1, HIGH);
-	digitalWrite(ledMap[led][1] + 1, LOW);
+void setMinuteActive() {
+	setActive(minutesMap[minute][0], minutesMap[minute][1]);
 }
 
-void setToInput(byte led) {
-	pinMode(ledMap[led][0] + 1, INPUT);
-	pinMode(ledMap[led][1] + 1, INPUT);
+void setHourActive() {
+	setActive(hoursMap[hour][0], hoursMap[hour][1]);
 }
 
-void setToOutput(byte led) {
-	pinMode(ledMap[led][0] + 1, OUTPUT);
-	pinMode(ledMap[led][1] + 1, OUTPUT);
+void setMinuteInactive() {
+	setToInput(minutesMap[minute][0]);
+	setToInput(minutesMap[minute][1]);
+}
+
+void setHourInactive() {
+	setToInput(hoursMap[hour][0]);
+	setToInput(hoursMap[hour][1]);
+}
+
+void setActive(byte highPin, byte lowPin) {
+	setToOutput(highPin);
+	setToOutput(lowPin);
+	setToHigh(highPin);
+	setToLow(lowPin);
+}
+
+void setToHigh(byte pin) {
+	digitalWrite(pin + PIN_OFFSET, HIGH);
+}
+
+void setToLow(byte pin) {
+	digitalWrite(pin + PIN_OFFSET, LOW);
+}
+
+void setToInput(byte pin) {
+	pinMode(pin + PIN_OFFSET, INPUT);
+}
+
+void setToOutput(byte pin) {
+	pinMode(pin + PIN_OFFSET, OUTPUT);
 }
